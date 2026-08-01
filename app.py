@@ -6,7 +6,7 @@ import edge_tts
 from deep_translator import GoogleTranslator
 from flask import Flask, render_template, request, jsonify, send_file
 
-app = Flask(name)
+app = Flask(__name__)
 
 DOWNLOAD_FOLDER = 'downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
@@ -95,5 +95,5 @@ def download_file():
         return send_file(file_path, as_attachment=True, download_name='thiha_ai_dubbed_1080p.mp4')
     return "File မရှိပါ။", 404
 
-if name == 'main':
+if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
