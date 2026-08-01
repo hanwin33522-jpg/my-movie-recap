@@ -42,7 +42,7 @@ def process_movie():
         cmd_dl = f'yt-dlp -f "b[ext=mp4]/b" -o "{raw_video}" "{movie_url}"'
         subprocess.run(cmd_dl, shell=True, check=True)
 
-        # ၂။ အသံကို စာသားပြောင်းခြင်း (ဒီနေရာမှာမှ Model ကို ခဏခေါ်သုံးမည် - RAM မပြည့်စေရန်)
+        # ၂။ အသံကို စာသားပြောင်းခြင်း (Tiny Model)
         print("Loading Whisper Tiny Model for transcription...")
         model = whisper.load_model("tiny")
         result = model.transcribe(raw_video, fp16=False)
@@ -57,11 +57,11 @@ def process_movie():
         # ၄။ AI ရဲ့ Thiha Voice ဖြင့် အသံဖိုင် ဖန်တီးခြင်း
         asyncio.run(generate_thiha_voice(myanmar_text, thiha_audio))
 
-        # ၅။ 1080p Resolution + Copyright bypass Filter များဖြင့် ဗီဒီယို ပေါင်းစပ်ခြင်း
+        # ၅။ RAM စားသက်သာစေရန် 480p Resolution သို့ လျော့ချ၍ ပေါင်းစပ်ခြင်း
         ffmpeg_cmd = (
             f'ffmpeg -y -i "{raw_video}" -i "{thiha_audio}" '
-            f'-filter_complex "[0:v]hflip,scale=1080:1920:force_original_aspect_ratio=increase,crop=1080:1920[v];[1:a]atempo=1.03[a]" '
-            f'-map "[v]" -map "[a]" -c:v libx264 -preset fast -crf 22 -c:a aac "{final_output}"'
+            f'-filter_complex "[0:v]hflip,scale=480:854:force_original_aspect_ratio=increase,crop=480:854[v];[1:a]atempo=1.03[a]" '
+            f'-map "[v]" -map "[a]" -c:v libx264 -preset ultrafast -crf 28 -c:a aac "{final_output}"'
         )
         
         subprocess.run(ffmpeg_cmd, shell=True, check=True)
@@ -72,7 +72,7 @@ def process_movie():
         <p><b>📝 မူရင်း စာသား:</b> {english_text}</p>
         <p><b>🇲🇲 မြန်မာစာ ဘာသာပြန်:</b> {myanmar_text}</p>
         <p><b>🗣️ သုံးထားသော AI အသံ:</b> Microsoft Thiha Voice (my-MM-ThihaNeural)</p>
-        <p><b>📐 Resolution:</b> 1080p (Full HD)</p>
+        <p><b>📐 Resolution:</b> 480p (RAM Optimized)</p>
         <p>အောက်ပါ ခလုတ်ကို နှိပ်၍ ဒေါင်းလုဒ်ဆွဲနိုင်ပါပြီ။</p>
         """
 
@@ -90,7 +90,7 @@ def process_movie():
 def download_file():
     file_path = os.path.join(DOWNLOAD_FOLDER, 'final_dubbed_movie.mp4')
     if os.path.exists(file_path):
-        return send_file(file_path, as_attachment=True, download_name='thiha_ai_dubbed_1080p.mp4')
+        return send_file(file_path, as_attachment=True, download_name='thiha_ai_dubbed_480p.mp4')
     return "File မရှိပါ။", 404
 
 if __name__ == '__main__':
