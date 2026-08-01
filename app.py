@@ -11,10 +11,6 @@ app = Flask(__name__)
 DOWNLOAD_FOLDER = 'downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
-# RAM 512MB ထဲတွင် အဆင်ပြေစေရန် 'tiny' Whisper Model ကို သုံးထားပါသည်
-print("Loading Whisper AI Tiny Model...")
-model = whisper.load_model("tiny")
-
 # Edge TTS (Thiha Voice) အသုံးပြု၍ အသံဖိုင်ထုတ်ပေးသော function
 async def generate_thiha_voice(text, output_path):
     communicate = edge_tts.Communicate(text, "my-MM-ThihaNeural")
@@ -46,7 +42,9 @@ def process_movie():
         cmd_dl = f'yt-dlp -f "b[ext=mp4]/b" -o "{raw_video}" "{movie_url}"'
         subprocess.run(cmd_dl, shell=True, check=True)
 
-        # ၂။ ဗီဒီယိုထဲမှ အသံကို စာသားပြောင်းခြင်း (Whisper Transcript - tiny model)
+        # ၂။ ဗီဒီယိုထဲမှ အသံကို စာသားပြောင်းခြင်း (Memory မပြည့်စေရန် လိုအပ်မှ Model ကို Load လုပ်မည်)
+        print("Loading Whisper Tiny Model for transcription...")
+        model = whisper.load_model("tiny")
         result = model.transcribe(raw_video, fp16=False)
         english_text = result.get('text', '')
 
