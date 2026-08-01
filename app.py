@@ -42,7 +42,7 @@ def process_movie():
         cmd_dl = f'yt-dlp -f "b[ext=mp4]/b" -o "{raw_video}" "{movie_url}"'
         subprocess.run(cmd_dl, shell=True, check=True)
 
-        # ၂။ ဗီဒီယိုထဲမှ အသံကို စာသားပြောင်းခြင်း (Memory မပြည့်စေရန် လိုအပ်မှ Model ကို Load လုပ်မည်)
+        # ၂။ အသံကို စာသားပြောင်းခြင်း (ဒီနေရာမှာမှ Model ကို ခဏခေါ်သုံးမည် - RAM မပြည့်စေရန်)
         print("Loading Whisper Tiny Model for transcription...")
         model = whisper.load_model("tiny")
         result = model.transcribe(raw_video, fp16=False)
@@ -54,7 +54,7 @@ def process_movie():
         # ၃။ အင်္ဂလိပ်မှ မြန်မာစာသို့ ဘာသာပြန်ခြင်း
         myanmar_text = GoogleTranslator(source='auto', target='my').translate(english_text)
 
-        # ၄။ AI ရဲ့ "my-MM-ThihaNeural" (Thiha Voice) ဖြင့် အသံဖိုင် ဖန်တီးခြင်း
+        # ၄။ AI ရဲ့ Thiha Voice ဖြင့် အသံဖိုင် ဖန်တီးခြင်း
         asyncio.run(generate_thiha_voice(myanmar_text, thiha_audio))
 
         # ၅။ 1080p Resolution + Copyright bypass Filter များဖြင့် ဗီဒီယို ပေါင်းစပ်ခြင်း
