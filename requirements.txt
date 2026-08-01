@@ -1,5 +1,5 @@
 Flask
 yt-dlp
-faster-whisper
+openai-whisper
 deep-translator
 edge-tts
