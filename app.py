@@ -6,14 +6,14 @@ import edge_tts
 from deep_translator import GoogleTranslator
 from flask import Flask, render_template, request, jsonify, send_file
 
-app = Flask(__name__)
+app = Flask(name)
 
 DOWNLOAD_FOLDER = 'downloads'
 os.makedirs(DOWNLOAD_FOLDER, exist_ok=True)
 
-# Whisper AI Model ကို Load လုပ်ခြင်း
-print("Loading Whisper AI Model...")
-model = whisper.load_model("base")
+# RAM 512MB ထဲတွင် အဆင်ပြေစေရန် 'tiny' Whisper Model ကို သုံးထားပါသည်
+print("Loading Whisper AI Tiny Model...")
+model = whisper.load_model("tiny")
 
 # Edge TTS (Thiha Voice) အသုံးပြု၍ အသံဖိုင်ထုတ်ပေးသော function
 async def generate_thiha_voice(text, output_path):
@@ -46,7 +46,7 @@ def process_movie():
         cmd_dl = f'yt-dlp -f "b[ext=mp4]/b" -o "{raw_video}" "{movie_url}"'
         subprocess.run(cmd_dl, shell=True, check=True)
 
-        # ၂။ ဗီဒီယိုထဲမှ အသံကို စာသားပြောင်းခြင်း (Whisper Transcript)
+        # ၂။ ဗီဒီယိုထဲမှ အသံကို စာသားပြောင်းခြင်း (Whisper Transcript - tiny model)
         result = model.transcribe(raw_video, fp16=False)
         english_text = result.get('text', '')
 
@@ -95,5 +95,5 @@ def download_file():
         return send_file(file_path, as_attachment=True, download_name='thiha_ai_dubbed_1080p.mp4')
     return "File မရှိပါ။", 404
 
-if __name__ == '__main__':
+if name == 'main':
     app.run(host='0.0.0.0', port=5000, debug=True)
