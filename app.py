@@ -38,8 +38,8 @@ def process_movie():
             if os.path.exists(f):
                 os.remove(f)
 
-        # ၁။ ဗီဒီယို ဒေါင်းလုဒ်ဆွဲခြင်း
-        cmd_dl = f'yt-dlp -f "b[ext=mp4]/b" -o "{raw_video}" "{movie_url}"'
+        # ၁။ ဗီဒီယိုနှင့် Shorts များကို အလွယ်တကူ ဒေါင်းလုဒ်ဆွဲနိုင်သော Command
+        cmd_dl = f'yt-dlp -f "bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=mp4]/best" -o "{raw_video}" "{movie_url}"'
         subprocess.run(cmd_dl, shell=True, check=True)
 
         # ၂။ အသံကို စာသားပြောင်းခြင်း (Tiny Model)
@@ -57,7 +57,7 @@ def process_movie():
         # ၄။ AI ရဲ့ Thiha Voice ဖြင့် အသံဖိုင် ဖန်တီးခြင်း
         asyncio.run(generate_thiha_voice(myanmar_text, thiha_audio))
 
-        # ၅။ RAM စားသက်သာစေရန် 480p Resolution သို့ လျော့ချ၍ ပေါင်းစပ်ခြင်း
+        # ၅။ RAM စားသက်သာစေရန် 480p Resolution ဖြင့် ပေါင်းစပ်ခြင်း
         ffmpeg_cmd = (
             f'ffmpeg -y -i "{raw_video}" -i "{thiha_audio}" '
             f'-filter_complex "[0:v]hflip,scale=480:854:force_original_aspect_ratio=increase,crop=480:854[v];[1:a]atempo=1.03[a]" '
